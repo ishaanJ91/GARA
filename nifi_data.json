@@ -1,0 +1,710 @@
+[
+  {
+    "number": 10115,
+    "diff_url": "https://github.com/apache/nifi/pull/10115.diff",
+    "reviews": [
+      {
+        "user": "rfellows",
+        "comment": "I reviewed this from a UI perspective...\r\n\r\nThe concern that I have is that the \"Reset All\" button and dialog might be a bit ambiguous when the list of Counters has been filtered. The users might assume that only the Counters that match the filter criteria will be reset. Maybe the description in the confirmation dialog should indicate the total number of Counters getting reset?\r\n\r\nI suppose another, more involved option would be to give the user the option to reset only the \"filtered\" Counters in addition to all. Not sure how beneficial that might be however. Might be enough to just make it more clear in the dialog that you are resetting `X` number of Counters.",
+        "submitted_at": "2025-07-22T18:42:01+00:00"
+      },
+      {
+        "user": "exceptionfactory",
+        "comment": "Thanks for working on this @mcgilman! On a quick review of the REST API, I was wondering about the potential use of the `DELETE` method instead of `PUT`, but given the behavior, `PUT` looks good. I suppose `DELETE` would work as a way to actually delete existing counters, but that is a more destructive, so this looks like the right way to go.",
+        "submitted_at": "2025-07-22T21:17:31+00:00"
+      },
+      {
+        "user": "rfellows",
+        "comment": "Thanks for the changes @mcgilman. This is a nice productivity boosting feature.",
+        "submitted_at": "2025-07-23T14:07:11+00:00"
+      }
+    ],
+    "merged_at": "2025-07-23T15:20:17+00:00",
+    "num_comments": 3,
+    "num_files": 23
+  },
+  {
+    "number": 10101,
+    "diff_url": "https://github.com/apache/nifi/pull/10101.diff",
+    "reviews": [
+      {
+        "user": "exceptionfactory",
+        "comment": "Thanks for addressing this issue @bbende. The updated implementation and new cluster protocol messages for node status look good. I noted one small recommendation regarding exception message formatting, otherwise this looks good.",
+        "submitted_at": "2025-07-19T21:51:35+00:00"
+      },
+      {
+        "user": "exceptionfactory",
+        "comment": "Thanks for making the adjustment to the message @bbende, the latest version looks good! +1 merging",
+        "submitted_at": "2025-07-22T01:37:30+00:00"
+      },
+      "Although the `due to` approach with concatenated Exception.toString() still exists in some places, it is unnecessarily repetitive, since the Exception stack trace includes all those details.\r\n```suggestion\r\n            throw new ProtocolException(\"Failed to get Service Address\", e);\r\n```"
+    ],
+    "merged_at": "2025-07-22T01:38:05+00:00",
+    "num_comments": 3,
+    "num_files": 13
+  },
+  {
+    "number": 10066,
+    "diff_url": "https://github.com/apache/nifi/pull/10066.diff",
+    "reviews": [
+      {
+        "user": "exceptionfactory",
+        "comment": "Thanks for working on this @pvillard31.\r\n\r\nAs the upgrade to OkHttp 5 includes a number of code changes, it could be useful to break it out into a separate Jira issue and PR for tracking. Reviewing the change log, it seems mostly straightforward, but it is significant enough that it seems better to handle independently as a major version upgrade.",
+        "submitted_at": "2025-07-03T20:51:19+00:00"
+      },
+      {
+        "user": "exceptionfactory",
+        "comment": "Thanks for decoupling this upgrade from the other incremental changes @pvillard31. The changes look good, just needs to be rebased and then it should be ready to go.",
+        "submitted_at": "2025-07-04T17:29:08+00:00"
+      },
+      {
+        "user": "exceptionfactory",
+        "comment": "Thanks again @pvillard31! +1 merging",
+        "submitted_at": "2025-07-05T15:09:03+00:00"
+      }
+    ],
+    "merged_at": "2025-07-05T15:09:31+00:00",
+    "num_comments": 3,
+    "num_files": 41
+  },
+  {
+    "number": 10062,
+    "diff_url": "https://github.com/apache/nifi/pull/10062.diff",
+    "reviews": [
+      {
+        "user": "awelless",
+        "comment": "Many nitpicks and a few questions.\r\nLooks good overall",
+        "submitted_at": "2025-07-02T15:05:44+00:00"
+      },
+      {
+        "user": "awelless",
+        "comment": "lgtm",
+        "submitted_at": "2025-07-03T11:24:58+00:00"
+      },
+      {
+        "user": "exceptionfactory",
+        "comment": "Thanks for working on this addition to Amazon Glue schema support.\r\n\r\nAlthough the `schema-registry-serde` library makes it appear straightforward, the large number of transitive dependencies in that library present a maintenance and packaging problem. Given that support schema types are already limited, it seems like a solution that avoids the dependency would provide a better way forward.\r\n\r\nThe [getSchemaVersionId](https://github.com/awslabs/aws-glue-schema-registry/blob/c6a911301ea8ca72260bed3f2dfda83f3effcba2/serializer-deserializer/src/main/java/com/amazonaws/services/schemaregistry/deserializers/GlueSchemaRegistryDeserializerDataParser.java#L67) method looks straightforward, and since the code is licensed under Apache Software License 2.0, it appears to be a good candidate for direct inclusion.",
+        "submitted_at": "2025-07-07T20:38:45+00:00"
+      },
+      {
+        "user": "exceptionfactory",
+        "comment": "It is also worth noting that the Git diff marks the entire file content as changed, although it is not immediately clear why that is happening.",
+        "submitted_at": "2025-07-07T20:40:12+00:00"
+      },
+      {
+        "user": "exceptionfactory",
+        "comment": "Thanks for making the adjustments @dariuszseweryn. This looks close to completion. Just noted that the details regarding the copied classes can be referenced in the `NOTICE` instead of the package-level README.md.",
+        "submitted_at": "2025-07-08T21:13:44+00:00"
+      },
+      {
+        "user": "exceptionfactory",
+        "comment": "Thanks for working through the feedback @dariuszseweryn, the latest version looks good. +1 merging",
+        "submitted_at": "2025-07-10T19:59:04+00:00"
+      },
+      "```suggestion\r\n    private static final Set<SchemaField> SUPPLIED_SCHEMA_FIELDS = Set.of(SchemaField.SCHEMA_NAME);\r\n```\r\nIt should be schema name.",
+      "Nit: instead of using a static util class we can create a specific `WireFormatAwsGlueSchemaId`.\r\nE.g.\r\n```java\r\nrecord WireFormatAwsGlueSchemaId(UUID id) {\r\n  String toSchemaName() {\r\n     return prefix + id;   \r\n  }\r\n  \r\n  static Optional<WireFormatAwsGlueSchemaId> fromSchemaName(String name) {\r\n    ...\r\n  } \r\n```",
+      "Also, it seems this class can be package-private",
+      "Nit: shouldn't it be `schemaVersionIdCache`, as in the `getSchema` method?",
+      "Nit: we can verify that expected `schemaVersionId` was passed. (verbosity alert!)\r\n```suggestion\r\n        when(mockClient.getSchemaVersion(argThat((GetSchemaVersionRequest req) -> schemaVersionId.toString().equals(req.schemaVersionId()))).thenReturn(mockResponse);\r\n\r\n```",
+      "Why are these fields differrent from the ones in `createRecordSchema`? \r\nIn both cases we accept `createRecordSchema`. Do the field values differ depending on how a schema is retrieved?",
+      "Namespace is optional in the Avro schema. It also does not seem to be very precise in describing a schema version since same namespace can be used in different schemas whereas ARN with version ID should be precise",
+      "Changed to a record",
+      "Changed to `schemaVersionIdCache`",
+      "This dependency has over 100 transitive dependencies, which is a serious problem from a maintenance perspective.",
+      "```suggestion\r\n    public GlueSchemaRegistryIncompatibleDataException(final String message) {\r\n```",
+      "This file can be removed and the reference to this package should be mentioned in the `NOTICE` file.",
+      "A line should be added here to reference the NiFi package that contains the copied classes."
+    ],
+    "merged_at": "2025-07-10T20:01:34+00:00",
+    "num_comments": 19,
+    "num_files": 12
+  },
+  {
+    "number": 10030,
+    "diff_url": "https://github.com/apache/nifi/pull/10030.diff",
+    "reviews": [
+      {
+        "user": "exceptionfactory",
+        "comment": "Thanks for working on these issues @awelless.\r\n\r\nReviewing the test failures, it appears that a simple change to `long` has a more significant impact. Reviewing the failing tests and associated behavior expectations would be a good next step.\r\n\r\n```\r\norg.apache.nifi.record.path.TestRecordPath$StandaloneFunctions$RecordOf.supportsCreatingRecordFromLiteralValue -- Time elapsed: 0.011 s <<< FAILURE!\r\norg.opentest4j.MultipleFailuresError: \r\nMultiple Failures (2 failures)\r\n\torg.opentest4j.AssertionFailedError: expected: <INT> but was: <LONG>\r\n\torg.opentest4j.AssertionFailedError: expected: java.lang.Integer@119f1f2a<2012> but was: java.lang.Long@1a1da881<2012>\r\n```",
+        "submitted_at": "2025-06-20T12:55:58+00:00"
+      },
+      {
+        "user": "exceptionfactory",
+        "comment": "Thanks for the updates to maintain compatibility @awelless.\r\n\r\nOn further review, the new `NumberComparisonFilter` introduces a duplicative type check for the `Number` arguments. As noted in comments, the approach should be refactored to call type-specific methods avoid the `instanceof` checks.",
+        "submitted_at": "2025-06-21T14:31:51+00:00"
+      },
+      {
+        "user": "exceptionfactory",
+        "comment": "Thanks for making the adjustments @awelless, the latest version looks good. +1 merging",
+        "submitted_at": "2025-06-26T12:55:54+00:00"
+      },
+      "The result of this expression was always upcasted to`Double`, even when the first branch was chosen.\r\nTo remediate this we should separate conversion to longs and doubles.",
+      "This check is duplicative of existing checks in the parent class, which already determines whether the numbers are compatible with the `Long` type.",
+      "Instead of passing the untyped `Number`, separate concrete methods should be defined, one for `long` types and one for `double` types. Those separate implementations can then call the abstract `verifyComparisonResult`.",
+      "The concern was that not all subclasses of `NumericBinaryOperatorFilter` would care about the specific types. But since there are only comparison operators for now, we should be good with introducing 2 separate methods for longs and doubles.\r\nChanged."
+    ],
+    "merged_at": "2025-06-26T12:57:05+00:00",
+    "num_comments": 7,
+    "num_files": 8
+  },
+  {
+    "number": 10014,
+    "diff_url": "https://github.com/apache/nifi/pull/10014.diff",
+    "reviews": [
+      {
+        "user": "exceptionfactory",
+        "comment": "Thanks for addressing the stop and terminate behavior of Stateless Process Groups @markap14. The code changes and new tests look good. Just one minor issue that PMD scanning flagged, and then this should be ready to go.",
+        "submitted_at": "2025-06-13T18:50:55+00:00"
+      },
+      {
+        "user": "exceptionfactory",
+        "comment": "Thanks for making the adjustment @markap14, looks good! +1 merging",
+        "submitted_at": "2025-06-13T19:43:13+00:00"
+      },
+      "PMD flags empty catch blocks, but changing the variable to `ignored` resolves the warning and indicates expected behavior.\r\n```suggestion\r\n            } catch (final InterruptedException ignored) {\r\n```"
+    ],
+    "merged_at": "2025-06-13T19:44:45+00:00",
+    "num_comments": 3,
+    "num_files": 28
+  },
+  {
+    "number": 9942,
+    "diff_url": "https://github.com/apache/nifi/pull/9942.diff",
+    "reviews": [
+      {
+        "user": "exceptionfactory",
+        "comment": "Thanks for the work on this additional output strategy @pvillard31! The general implementation looks good. I noted several minor recommendations, and highlighted one case where `null` handling was unclear.",
+        "submitted_at": "2025-05-14T14:32:28+00:00"
+      },
+      {
+        "user": "exceptionfactory",
+        "comment": "Thanks for making the adjustments @pvillard31, and thanks for the review @joewitt, I agree that the latest implementation looks good. +1 merging",
+        "submitted_at": "2025-05-14T22:26:38+00:00"
+      },
+      "Is this pattern value intentional? As defined, it matches zero or more occurrences of the letter `r` at the end of the string, versus `header.*` which would match anything starting with `header`.",
+      "For consistency on best practices, `ObjectMapper` should be defined as a static value and reused.",
+      "Although this approach works, `while (true)` initially looks concerning. What do you think about changing the loop to check `record != null` as the condition?",
+      "Is there a reason not to use try-with-resources here?",
+      "Do these members need to be `public`?",
+      "```suggestion\r\n        final RecordSchema recordSchemaKey = recordKey == null ? null : recordKey.getSchema());\r\n```",
+      "Minor recommendation:\r\n```suggestion\r\n        final RecordSchema metadataRecordSchema = new SimpleRecordSchema(List.of(FIELD_TOPIC, FIELD_PARTITION, FIELD_OFFSET, FIELD_TIMESTAMP, fieldKey, FIELD_HEADERS));\r\n```",
+      "`fieldKey` will be `null` if the above `recordSchemaKey` is null. That means the List of fields needs to be built conditionally to avoid including a `null` element.",
+      "Can `fieldKey` be `null` here? If not, `Objects.requireNonNull()` should be used.",
+      "Minor but important naming question, what do you think about `recordMetadata` as the name? Alternatively, the camel-case `kafkaMetadata` seems worth considering.",
+      "This is actually not used when using an output strategy that will contain the headers, this was a copy/paste from the other IT class for the wrapper output strategy. Will remove in both places.",
+      "There is actually a mapper already available from the abstract class, will use that instead",
+      "I reference those in the integration test. I can go with the string values in the test instead and switch to private here.",
+      "Yeah so I really wanted to have kafka in the field name because we want to limit the potential risk of colliding with an existing field in the Kafka message. Will switch to `kafkaMetadata`.",
+      "Yes we can have a message with a `null` key - I've updated the test to cover this case and updated the code in consequence.",
+      "Yes I have updated the code and test to confirm this scenario.",
+      "Thanks, `kafkaMetadata` sounds good.",
+      "So I did give a shot to a try-with-resources here and it caused failures in many tests when dealing with malformed records. I'm keeping the code as-is for now (this is the code that we currently have) and will revisit later if that's ok.",
+      "Good point",
+      "Sounds good, thanks for evaluating."
+    ],
+    "merged_at": "2025-05-14T22:26:58+00:00",
+    "num_comments": 22,
+    "num_files": 14
+  },
+  {
+    "number": 9884,
+    "diff_url": "https://github.com/apache/nifi/pull/9884.diff",
+    "reviews": [
+      {
+        "user": "exceptionfactory",
+        "comment": "Thanks for proposing this addition @buczi. I recommended some naming and labeling changes, but tagging @mcgilman and @scottyaslan for additional review.",
+        "submitted_at": "2025-04-18T15:27:06+00:00"
+      },
+      {
+        "user": "mcgilman",
+        "comment": "Thanks for the PR @buczi! I've left a few notes below. Please ensure that your evaluating the proposed changes with all possible permission scenarios.",
+        "submitted_at": "2025-04-26T14:15:37+00:00"
+      },
+      {
+        "user": "mcgilman",
+        "comment": "Thanks for the updates! Just noted a few issues with the updated test spec.",
+        "submitted_at": "2025-06-16T13:37:43+00:00"
+      },
+      {
+        "user": "mcgilman",
+        "comment": "Thanks for the updates @buczi!",
+        "submitted_at": "2025-07-22T22:19:57+00:00"
+      },
+      "The label `bounded` is not quite right, it could be `bound process groups`, but just using `process groups` sounds better.",
+      "```suggestion\r\n    formatBoundProcessGroups(entity: ParameterContextEntity): string {\r\n```",
+      "```suggestion\r\n        const boundProcessGroupNames: string[] =  component.boundProcessGroups\r\n```",
+      "Instead of returning `(shared)` for multiple groups, I recommend returning the number of process groups.",
+      "I recommend just `process groups`, or perhaps `bound process groups`.\r\n```suggestion\r\n            <ng-container matColumnDef=\"process group\">\r\n```",
+      "Sure, I renamed the column to `process group` and adjusted the naming so that there is no `bounded`.",
+      "That will be nice! I adjusted the code.",
+      "We need to account for the current users permissions here. When the user lacks permissions to the given Parameter Context or any bound process group this throws an error causing rendering issues in the UI.",
+      "Please fix the formatting here. This can be accomplished by running:\r\n\r\n`$ npx nx prettier:format`",
+      "This is unused.",
+      "This is unused.",
+      "There are failing tests in this spec."
+    ],
+    "merged_at": "2025-07-22T22:20:21+00:00",
+    "num_comments": 16,
+    "num_files": 12
+  },
+  {
+    "number": 9874,
+    "diff_url": "https://github.com/apache/nifi/pull/9874.diff",
+    "reviews": [
+      {
+        "user": "exceptionfactory",
+        "comment": "Thanks for working on this @zhtk. The general approach looks straightforward. Although there are potential memory implications for the older XLS format, this seems to be the best implementation strategy for now.\r\n\r\nI noted one particular issue related to password handling for XLS files, and the lack of thread safety. As mentioned, I think the best option for now is to not support encrypted XLS, and let the read operation fail.",
+        "submitted_at": "2025-04-21T14:47:07+00:00"
+      },
+      {
+        "user": "dan-s1",
+        "comment": "@zhtk great work so far. I had a few more suggestions.",
+        "submitted_at": "2025-05-07T14:57:27+00:00"
+      },
+      {
+        "user": "dan-s1",
+        "comment": "I noticed one more thing (hopefully the last :) )",
+        "submitted_at": "2025-05-08T16:01:46+00:00"
+      },
+      {
+        "user": "exceptionfactory",
+        "comment": "Thanks for bringing this to completion @zhtk, and thanks for the reviews along the way @dan-s1, the latest version looks good.\r\n\r\nI was going to note that the `displayName()` element on the property is not necessary, but I see that follows the other properties for now, so removing the `displayName()` across the board can be handled separately.\r\n\r\n+1 merging",
+        "submitted_at": "2025-05-10T16:39:40+00:00"
+      },
+      "This is problematic for multi-threaded use of ExcelReader, which is very possible. Under the circumstances, it seems best to avoid attempting to support encrypted XLS files right now. This will likely throw exceptions when `HSSFWorkbook` attempts to read, but that is acceptable under the circumstances, as it is a limitation of the library.",
+      "Minor naming recommend:\r\n```suggestion\r\n    private boolean isXmlFormat(final InputStream in, final String password) {\r\n```",
+      "It would be helpful to refactor this method to use a single return.",
+      "It looks like the `reset()` call should be moved to a `finally` block in case of exceptions.",
+      "In addition\r\n- The creation of `POIFSFileSystem` and the assignment to `root` should be done on separate lines. \r\n- The return statement should be included in the try block since if the instantiation of `POIFSFileSystem` throws an IOException the return statement is never reached anyway.\r\n\r\n```suggestion\r\n        try {\r\n           final POIFSFileSystem poifsFileSystem = new POIFSFileSystem(new NonCloseableInputStream(in)).getRoot();\r\n           final DirectoryNode root = poifsFileSystem.getRoot() ;\r\n           return root.hasEntryCaseInsensitive(DEFAULT_POIFS_ENTRY) || root.hasEntryCaseInsensitive(OOXML_PACKAGE);\r\n           }\r\n```",
+      "or perhaps\r\n```suggestion\r\n    private boolean isXSSF(InputStream in, final String password) {\r\n```\r\n\r\nsince in POI, the different implementations they have are referred to as HSSF and XSSF.",
+      "@exceptionfactory Just want to clarify, since `reset` can also throw an `IOException` then the `finally` would have to also have a try catch block.",
+      "Yes, that is correct.",
+      "@exceptionfactory If we will not support encrypted XLS, then shouldn't we make changes in the UI and add another PropertyDescriptor to indicate whether we will be reading XLS/XLSX and make the password property descriptor dependent on it? This could potentially simplify the logic and not necessitate the use of `FileMagic`.",
+      "Although making the Input File Type a configurable property is an option, there are positives and negatives to consider requiring the configuration. On the one hand, IdentifyMimeType could be used with a RouteOnAttribute Processor to determine the appropriate routing. On the other hand, that increases the potential flow design complexity when attempting to support both XLS and XLSX.\r\n\r\nI agree that introducing a new configuration property would simplify this logic and remove the need for File Type detection.\r\n\r\nGiven the mismatch in functionality, with and without support for password-protection, there does seem to be some value in requiring one type or the other.\r\n\r\nIt is also worth noting that XLS has not been supported previously, and that it has different memory usage characteristics as previously discussed.\r\n\r\nWith that in mind, I would be open to adding a new property named `Input File Type` with `XLSX` and `XLS` values, where `XLSX` would be the default type. The Property could support Expression Language, which is resolvable from the Map of variables passed to `createRecordReader()`.",
+      "@zhtk Are you clear on the changes needed?",
+      "@dan-s1, @exceptionfactory, I'm clear, although I'm worried that for my use case sooner or later I'll need to support encryption. I already have users asking if file decryption will be supported. I don't exactly get why thread safety is the issue - I checked with debugger, that password is read and decrypting stream is created when HSSFWorkbook instance is created. Here is stack trace:\r\n\r\n```\r\ngetCurrentUserPassword:52, Biff8EncryptionKey (org.apache.poi.hssf.record.crypto)\r\ncreateDecryptingStream:107, RecordFactoryInputStream$StreamEncryptionInfo (org.apache.poi.hssf.record)\r\n<init>:189, RecordFactoryInputStream (org.apache.poi.hssf.record)\r\ncreateRecords:184, RecordFactory (org.apache.poi.hssf.record)\r\n<init>:377, HSSFWorkbook (org.apache.poi.hssf.usermodel)\r\n<init>:437, HSSFWorkbook (org.apache.poi.hssf.usermodel)\r\n<init>:417, HSSFWorkbook (org.apache.poi.hssf.usermodel)\r\n<init>:67, RowIterator (org.apache.nifi.excel)\r\n```\r\n\r\nSo even though POI interface is skewed that it uses thread variables, maybe it's not a problem to set thread variable and immediately create decrypted stream using this variable? It seems like the variable won't be used later and can be discarded. Or is it possible that thread execution can be interrupted when HSSFWorkbook constructor executed, the original thread reassigned to another task, and constructor execution resumed by another thread? Even if the thread is interrupted and thread variable with password remains set on the table, during next procedure execution it will be cleared and set to a currently needed value.\r\n\r\nI'm fine with adding `Input File Type` property even if the file encryption will eventually be supported, and agree with provided argumentation.\r\n\r\nWDYT?",
+      "@zhtk The thread safety issue is that calling a static method applies to all instances of the Reader. That means if there are multiple instances of the Excel Reader configured, with different passwords, different threads could step on each other. I recommend taking a closer look at the POI library to see if there are any other options. If this is the only approach supported in the library itself, then it would require more significant custom code to implement a solution that works in the context of NiFi.",
+      "@exceptionfactory, okay, the method is static, and the variable to which the method writes is static, but it's instance of `ThreadLocal<String>`. According to my understanding, any reads/writes to this variable will be only visible by thread accessing the variable.",
+      "Thanks for pointing to the source implementation of `Biff8EncryptionKey`, I see the use of `ThreadLocal` and the associated comments. That makes a significant difference, and alleviates the concerns of setting a shared variable.\r\n\r\nWith that clarification, I withdraw my earlier concerns. I would simply add a comment indicating that Biff8EncryptionKey stores the value in a ThreadLocal variable, and proceed.",
+      "```suggestion\r\n        + \"This reader is capable of processing both password and non password protected .xlsx (XSSF 2007 OOXML file format) \"\r\n        +  \" and older .xls (HSSF '97(-2007) file format) Excel documents.\")\r\n```",
+      "```suggestion\r\n    XLS(\"XLS\", \"HSSF '97(-2007) file format\"),\r\n    XLSX(\"XLSX\", \"\"XSSF 2007 OOXML file format\"\");\r\n```",
+      "This comment is regarding the whole if else statements between lines 47-66. Instead of an if else, an assignment with a switch statement would be clearer to indicate what code is needed for each Excel type. I was thinking along the line of this:\r\n\r\n```\r\nthis.workbook = switch(configuration.getInputFileType()) {\r\n            case XLSX -> StreamingReader.builder()\r\n                    .rowCacheSize(100)\r\n                    .bufferSize(4096)\r\n                    .password(configuration.getPassword())\r\n                    .setAvoidTempFiles(configuration.isAvoidTempFiles())\r\n                    .setReadSharedFormulas(true) // NOTE: If not set to true, then data with shared formulas fail.\r\n                    .open(in);\r\n            case XLS -> {\r\n                // Providing the password to the HSSFWorkbook is done by setting a thread variable managed by\r\n                // Biff8EncryptionKey. After the workbook is created, the thread variable can be cleared.\r\n                Biff8EncryptionKey.setCurrentUserPassword(configuration.getPassword());\r\n                try {\r\n                    yield new HSSFWorkbook(in);\r\n                } catch (final IOException e) {\r\n                    throw new ProcessException(\"Failed to open XLS file\", e);\r\n                } finally {\r\n                    Biff8EncryptionKey.setCurrentUserPassword(null);\r\n                }\r\n            }\r\n        };\r\n```",
+      "```suggestion\r\n        final List<RecordField> fields = List.of(\r\n```",
+      "Instead of a new test, combine this test and the previous test line 314-329 into a JUnit 5 org.junit.jupiter.params.ParameterizedTest with an org.junit.jupiter.params.provider.EnumSource. You can use the enum value in the configuration and to choose which password protected workbook to use.",
+      "Same as previous comment make this a Paramaterized test by combining this test with the one on lines 348-358",
+      "The `HSSF` acronym should not be used in user-facing labels and documentation. It is an acronym internal to the Apache POI project, and a pejorative one.",
+      "Thank for pointing that out. I did not realize that. Would it be still helpful to mention the years in the description e.g.\r\n ```\r\nXLS(\"XLS\", \"XLS 1997-2007 file format\"),\r\n XLSX(\"XLSX\", \"XLSX 2007-present OOXML file format\");\r\n```",
+      "@exceptionfactory Although I believe this is clearer code it would necessitate making changes in TestExcelHeaderSchemaStrategy to account for setting the InputFileType in the context otherwise the unit tests there will fail. Is this still worth it?",
+      "Yes, including the years in the description is helpful.",
+      "I'm not quite following the question, is what still worth it? Are you referring to \"if-else\" versus \"switch\", adding the new Input File Type property?",
+      "I meant the switch. I feel its clearer seeing which code gets called for which type. ",
+      "I prefer if-else for a smaller numbers of options, and switch when it comes to larger numbers. I would leave it as-is, but would be fine either way.",
+      "Changed",
+      "Good point, changed ",
+      "Keeping as is, but switch also makes sense here",
+      "Changed",
+      "Changed",
+      "Changed",
+      "For now I think we want the UI to only provide the 2 allowable choices and not allow for expression language.  If expression language is allowed then the UI will force the user to enter a value and not have a selection box. In a follow up conversation with @exceptionfactory he was okay to only allow for the allowable values.\r\n```suggestion\r\n```",
+      "Ah, good point, deleted",
+      "Since the value for `displayName` is the same as `value `just use `name()`.\r\n```suggestion\r\npublic enum InputFileType implements DescribedValue {\r\n    XLS(\"XLS 1997-2007 file format\"),\r\n    XLSX(\"XLSX 2007-present OOXML file format\");\r\n\r\n    InputFileType(String description) {\r\n        this.description = description;\r\n    }\r\n\r\n    private final String description;\r\n\r\n    @Override\r\n    public String getValue() {\r\n        return name();\r\n    }\r\n\r\n    @Override\r\n    public String getDisplayName() {\r\n        return name();\r\n    }\r\n```"
+    ],
+    "merged_at": "2025-05-10T16:40:53+00:00",
+    "num_comments": 41,
+    "num_files": 8
+  },
+  {
+    "number": 9851,
+    "diff_url": "https://github.com/apache/nifi/pull/9851.diff",
+    "reviews": [
+      {
+        "user": "exceptionfactory",
+        "comment": "I agree with @pvillard31 that the TestRunner should not have the option to opt out of the expected behavior.\r\n\r\nAlthough I agree that there is value in general with making incremental changes, I think this is a case where it is better to make all of the changes together.",
+        "submitted_at": "2025-04-07T14:52:20+00:00"
+      },
+      {
+        "user": "exceptionfactory",
+        "comment": "Thanks for the extensive work on making the changes to align expected behavior @EndzeitBegins. The changes looks good.\r\n\r\nAny additional feedback @pvillard31?",
+        "submitted_at": "2025-04-22T14:55:49+00:00"
+      },
+      {
+        "user": "pvillard31",
+        "comment": "Thanks for this work @EndzeitBegins - I'm a +1",
+        "submitted_at": "2025-04-22T15:05:12+00:00"
+      }
+    ],
+    "merged_at": "2025-04-22T19:08:08+00:00",
+    "num_comments": 3,
+    "num_files": 81
+  },
+  {
+    "number": 9837,
+    "diff_url": "https://github.com/apache/nifi/pull/9837.diff",
+    "reviews": [
+      {
+        "user": "exceptionfactory",
+        "comment": "Thanks for putting together a first draft of this implementation @arturchyzy. I noted a number of structural recommendations, as it appears there are several elements that can be removed and streamlined.",
+        "submitted_at": "2025-04-04T02:30:40+00:00"
+      },
+      {
+        "user": "exceptionfactory",
+        "comment": "Please review the system tests as they are currently failing, indicating that the implementation approach is breaking standard configuration behavior.",
+        "submitted_at": "2025-04-04T02:31:44+00:00"
+      },
+      {
+        "user": "exceptionfactory",
+        "comment": "Thanks for the updates @arturchyzy. I noted a few more required changes, and I also noticed the system tests are still failing.",
+        "submitted_at": "2025-04-07T14:38:20+00:00"
+      },
+      {
+        "user": "exceptionfactory",
+        "comment": "Thanks for the updates @arturchyzy, this is looking closer to completion.\r\n\r\nMy remaining comments relate to optimal conversion behavior, and handling of the default configuration with the FlowActionReporter unconfigured. If a FlowActionReporter is not configured, as would be the default behavior, the Action to FlowAction conversion should be skipped. This could be handled by allowing the `FlowActionReporter` to be null.\r\n\r\nAs a procedural note, please avoid squashing commits unless requested, or there is some compelling reason to do so, as it makes it difficult to track what changes in the course of the review.",
+        "submitted_at": "2025-04-08T13:45:29+00:00"
+      },
+      {
+        "user": "exceptionfactory",
+        "comment": "Thanks for working through the feedback @arturchyzy.\r\n\r\nI pushed an update that moves the Action conversion interface and implementation into `nifi-administration`, to avoid introducing the new dependency on `nifi-framework-components`.\r\n\r\nI also changed the `preDestruction()` method to `close()` in `FlowActionReporter` after considering the options for handling the nullability of the implementation. With `FlowActionReporter` extending `Closeable`, Spring will call `close()` when available, which avoids the null concerns around the `destroy-method` annotation.\r\n\r\nWith these changes, I'm planning to merge following successful build workflows.",
+        "submitted_at": "2025-04-14T15:52:03+00:00"
+      },
+      "The `components` element can be removed. As this is a convenience property, it is probably best to avoid adding it to `NiFiProperties` and define it in the appropriate class.",
+      "With this conversion being more of an implementation detail, I recommend moving this interface out of `nifi-framework-api` and into the component module.",
+      "These methods should have documentation. As a `FlowAction` is something to be consumed, I recommend simplifying the interface to just `getAttributes()`, the convenience `getAttribute()` method is not necessary.",
+      "The nested `enum` approach does not seem like the best approach. Instead, recommend using a single `enum` to enumerate all the attribute names, while retaining the prefixing.",
+      "The class and method should have basic documentation, following other framework interfaces.",
+      "Both of these objects should be wrapped with `Optional` to indicate that the framework may not provide them.",
+      "The source of these properties is not clear from the documentation, is this from application properties defined in `nifi.properties`? As it appears to be an empty Map on implementation, it is best to remove it for now.",
+      "The other two constructors without message arguments should be removed to require some description.",
+      "Formatting:\r\n```suggestion\r\n    }\r\n```",
+      "```suggestion\r\n    public FlowAction convert(final Action action) {\r\n```",
+      "Recommend moving this under `nifi-headless-server` to indicate that it is not used for standard framework operations.",
+      "Recommend moving this under `nifi-headless-server`",
+      "Move to `nifi-headless-server`",
+      "This change is unnecessary, and actually indicates that the `Headless` implementation classes can be removed.",
+      "This wrapper implementation seems unnecessary. Instead, I recommend wiring the `FlowActionReporter` directly to the `AuditService` implementation or directly to where `addActions` is called to avoid the coupling.",
+      "This service definition does not seem necessary, can it be removed?",
+      "This interface should be removed since it is just a simple wrapper right now. The `FlowActionAttribute` does not seem to provide much value, so I recommend removing it and naming the top-level `enum` as `FlowActionAttribute`.",
+      "The `reportFlowActions()` method is required to be implemented, so this portion of the comment should be removed.\r\n```suggestion\r\n * Uses {@link #preDestruction()} to allow for cleanup.\r\n```",
+      "```suggestion\r\n     * Retrieves SSLContext if configured in application properties\r\n```",
+      "```suggestion\r\n     * Retrieves the trust manager if configured in application properties\r\n```",
+      "It looks like the visibility of these properties can be reduced to `private`.",
+      "The default implementation is gone, so this should be removed.",
+      "Recommend a more specific exception:\r\n```suggestion\r\n            throw new IllegalStateException(\"Cannot create FlowActionReporter because the configuration is missing the following property: \"\r\n```",
+      "```suggestion\r\n            throw new IllegalStateException(\"Failed to create FlowActionReporter with class \" + configuredClassName, e);\r\n```",
+      "It seems unnecessary to define this as a Bean, I recommend instantiating the implementation directly in the `auditService()` method.",
+      "The individual methods create new Maps, but it would be more efficient to pass around the initial `attributes` Map to each method.",
+      "Instead of throwing an error on a blank value, this method should either return `null`, or it should return the `NoOp` implementation. See other comments on the potential approach.",
+      "Since the `FlowActionReporter` is a new optional feature, it seems best to avoid this call if it is not configured. That avoids the action conversion. Allowing `FlowActionReporter` to be `null` seems like a reasonable way to avoid the conversion, and the null check could be added before calling `reportFlowActions`"
+    ],
+    "merged_at": "2025-04-14T17:09:57+00:00",
+    "num_comments": 33,
+    "num_files": 14
+  },
+  {
+    "number": 9822,
+    "diff_url": "https://github.com/apache/nifi/pull/9822.diff",
+    "reviews": [
+      {
+        "user": "exceptionfactory",
+        "comment": "Thanks for proposing this improvement @pvillard31. The general concept makes sense, but what do you think about implementing this as a strategy property, such as `Token Refresh Strategy`? That could provide the opportunity for clearer definition of options, such as `On Token Expiration` for current behavior and `On Unauthorized Status` for the proposed behavior. It would also make it easier to implement additional options in the future if needed.",
+        "submitted_at": "2025-03-25T17:55:41+00:00"
+      },
+      {
+        "user": "exceptionfactory",
+        "comment": "Thanks for adjusting the property definition approach @pvillard31. Reviewing the Access Token Provider method, I raised a question on the method definition.",
+        "submitted_at": "2025-03-27T01:35:40+00:00"
+      },
+      {
+        "user": "exceptionfactory",
+        "comment": "Thanks for the updates @pvillard31, the `refreshAccessDetails()` method and implementation look good. Just a couple minor documentation and structural adjustments, and then this looks ready to go.",
+        "submitted_at": "2025-03-27T14:13:40+00:00"
+      },
+      {
+        "user": "exceptionfactory",
+        "comment": "Thanks for making the adjustments @pvillard31, the latest version looks good. +1 merging",
+        "submitted_at": "2025-03-27T16:34:13+00:00"
+      },
+      "I recommend `ON_UNAUTHORIZED_STATUS` or `ON_UNAUTHORIZED_RESPONSE` to align with the standard name for [HTTP 401](https://http.dev/401) status.",
+      "Instead of adding this new method and option, what do you think about promoting `refreshAccessDetails()` as an interface method? This would require calling both `refreshAccessDetails()` and then `getAccessDetails()`, but it would clarify that these are separate actions, the first of which could fail, allowing the caller to determine the desired behavior. The default implementation could be nothing, making it easier for third-party implementations to implement when desired, aligning with the optional usage of the new Token Refresh Strategy.",
+      "Yeah, you're right, I think it makes it easier from a caller perspective to understand the expected usage of those methods.",
+      "Thinking a bit more about it... `refreshAccessDetails()`, as of now, assumes that the refresh token is not null. Some services do not send a refresh token with the access token. So I'll have to adjust the logic just a bit.",
+      "```suggestion\r\n     * Request a new Access Token based on configured properties regardless of current expiration status. The default implementation does not perform any action.\r\n```",
+      "Recommend removing this comment and incorporating in the method comments.\r\n```suggestion\r\n```",
+      "Unnecessary newline can be removed:\r\n```suggestion\r\n```",
+      "Minor, but I recommend placing the logic in an `else` condition instead of the short-circuit return."
+    ],
+    "merged_at": "2025-03-27T16:34:59+00:00",
+    "num_comments": 12,
+    "num_files": 5
+  },
+  {
+    "number": 9816,
+    "diff_url": "https://github.com/apache/nifi/pull/9816.diff",
+    "reviews": [
+      {
+        "user": "exceptionfactory",
+        "comment": "Thanks for putting this together @pvillard31. It covers a lot of use cases, which adds complexity, but reflects the state of various services. I noted a number of recommendations, with the most important one being the removal of the `nifi-web-security` dependency.",
+        "submitted_at": "2025-04-02T15:56:53+00:00"
+      },
+      {
+        "user": "exceptionfactory",
+        "comment": "Thanks for moving this forward @pvillard31, it looks closer to completion, I noted a few minor adjustments and recommendations.",
+        "submitted_at": "2025-04-17T14:48:49+00:00"
+      },
+      {
+        "user": "exceptionfactory",
+        "comment": "Thanks for working through the feedback @pvillard31, the latest version looks good. +1 merging",
+        "submitted_at": "2025-04-22T14:23:56+00:00"
+      },
+      "The `nifi-web-security` module is a Framework dependency that should not be included.",
+      "It would be helpful to format this table using spaces to align columns for easier readability in the source Markdown.",
+      "This should be removed and replaced with the `ExtendWith(MockitoExtension.class)` annotation on the class.",
+      "Instead of mocking the context calls, it seems like it would be cleaner to use the TestRunner.",
+      "The Controller Service does not use OpenSAML, so is this required? It seems like it could be removed with the removal of `nifi-web-security`.",
+      "Instead of importing this class from the `nifi-web-security` module, a separate copy should be placed in this module to avoid the dependency.",
+      "Recommend moving this after the property descriptors.",
+      "Recommend formatting these values as one per line for readability.",
+      "Given that this implementation is `JWTBearer`, should the `Grant Type` be configurable?",
+      "Is there any reason not to set the `nbf` claim? It seems like it should always be included.",
+      "Is there any reason not to set this to `JWT` for all tokens as described in [RFC 7519](https://www.rfc-editor.org/rfc/rfc7519#section-5.1)?",
+      "Perhaps using the more descriptive name would be helpful?\r\n```suggestion\r\n            .name(\"Set JWT Header X.509 Certificate Thumbprint\")\r\n```",
+      "Having multiple nested `return` statements makes this method difficult to follow. Recommend refactoring to a single return and adjust the conditionals accordingly.",
+      "Minor convention recommendation:\r\n```suggestion\r\n        } catch (final Exception e) {\r\n```",
+      "```suggestion\r\n                throw new AccessTokenRetrievalException(\"Failed to acquire Access Token\", e);\r\n```",
+      "It is best to avoid ending log messages with a period character. However, shouldn't this throw an exception instead of logging a warning?\r\n```suggestion\r\n                    getLogger().warn(\"No key alias found, setting x5t header to null\");\r\n```",
+      "As above, shouldn't this condition throw an exception?",
+      "See above notes on exception and message formatting.",
+      "Recommend adjusting the formatting\r\n```suggestion\r\n                final String message = \"Failed to retrieve Access Token: HTTP %s with Response [%s]\".formatted(\r\n```",
+      "This seems like it should be named `setProperties()` since it doesn't return anything.",
+      "Unfortunately, the MSGraph example shows a case where Grant Type is different and where the JWT Bearer type is specified via a custom request form.",
+      "Based on the documentation, there are implementations not expecting it and where it fails if it is set... I could make the tests again to tell you again which test implementation exactly does not like it when set.",
+      "Same answer: some implementations are very strict in terms of expected fields in the header. I will test again to double check to be sure.",
+      "So I felt like not setting the field, logging a warning to have a bulletin on the controller service, and still trying to acquire the token was the best approach but happy to consider an exception instead if we feel like it's better to not even try.",
+      "Given that the property configuration expects the Certificate Thumbprint to be set, I think this should throw an exception as opposed to trying something that seems very unlikely to work.",
+      "I felt like using the TestRunner would make things more complicated in the end as I would need to simulate a processor that references the controller service to actually test the access token retrieval.",
+      "My bad, Salesforce seems to be OK when the header type is set, so I'll remove this property",
+      "My bad as well :) tested again all 4 services and they are all fine with NBF being set. Will remove.",
+      "The `StandardOauth2AccessTokenProviderTest` uses the `NoOpProcessor` and uses TestRunner to set properties and enable the Controller Service, so I don't think it would be necessary to build a Processor unless I am missing something.",
+      "Pushed a commit where I'm using the test runner instead. Not ideal as I can't call the customValidate directly and specifically check what is making the controller service invalid but that could be a follow up improvement in the test framework.",
+      "See #9841.",
+      "This could be reformatted using a multi line string instead of using concatenation.",
+      "It seems like the URL and Web Client Service properties should be moved near the top along with other required properties.",
+      "Multi line string could be used.",
+      "Recommend declaration `expirationTime` as a separate variable for readability and potential debugging.",
+      "Recommend moving the digest calculation to a private method.",
+      "It would be helpful to include the HTTP Status Code, and the URL if available for troubleshooting this warning.",
+      "Is the algorithmName check required here? It should be enforced through validation, and the `RSASSASigner` should also check the key type.",
+      "The cast variable name can be used, instead of casting below.\r\n```suggestion\r\n        if (privateKey instanceof RSAPrivateKey rsaPrivateKey) {\r\n```",
+      "```suggestion\r\n        } else if (privateKey instanceof ECPrivateKey ecPrivateKey) {\r\n```",
+      "This method is called from from error handling in `requestTokenEndpoint` where we log the HTTP Code and response. I added the URL as well. Not sure we should also add this information in this specific warn log, no?",
+      "Good point, in this case, I recommend removing this warning. It would probably be better to throw the exception, catch it in the calling method, and throw it as the cause of the `AccessTokenRetrievalException`.",
+      "Fair enough, pushed a commit to have a better logic there",
+      "Thanks, the updated approach looks good."
+    ],
+    "merged_at": "2025-04-22T14:24:23+00:00",
+    "num_comments": 47,
+    "num_files": 6
+  },
+  {
+    "number": 9812,
+    "diff_url": "https://github.com/apache/nifi/pull/9812.diff",
+    "reviews": [
+      {
+        "user": "exceptionfactory",
+        "comment": "Thanks for proposing these changes @dariuszseweryn. Honoring back pressure is an important improvement, but I think the interface naming and implementation needs to be reworked.\r\n\r\nThe `Pause` naming is very generic, and as this relates more specifically the consuming records, a more specific naming strategy would be more intuitive.\r\n\r\nOn the read side in the RecordProcessor classes, treating this as more of a conditional rather than `consumePause()` would be much clearer. There are some analogies to a [Semaphore](https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/Semaphore.html), although I don't think that actual class should be used here because of unnecessary complexity. The [ManagedBlocker](https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/ForkJoinPool.ManagedBlocker.html) seems a bit closer to what is intended here. What do you think about naming the basic interface something like `RecordProcessorBlocker`? That highlights the usage in `RecordProcessor` and also connotes blocking, which is the purpose of the abstraction. Perhaps `RecordProcessorLatch` could be better, inspired by the `CountDownLatch` class, but not necessarily tied to that implementation. The basic method could be `await()` following the `CountDownLatch` pattern.\r\n\r\nThe write side in the ConsumeKinesisStream Processor class would need a different set of methods, which could be declared on a concrete class if only referenced in that Processor. On that side, I don't think it is necessary pass in the `ProcessContext` in an `onTrigger()` method. Instead, the Processor itself could check the available relationship status, and then call a method. As far as naming, perhaps something using `block`  could be useful, such as `block()` and `unblock()`.\r\n\r\nWith that background, this highlights some of the shortcomings of the current Processor design, as described in other Jira issues, but it seems like a reasonable way forward with the right implementation.\r\n\r\n",
+        "submitted_at": "2025-03-19T15:12:04+00:00"
+      },
+      {
+        "user": "exceptionfactory",
+        "comment": "Thanks for the updates @dariuszseweryn, the naming looks like it is headed in a good direction. I noted a handful of additional naming consistency items, along with some questions around test and runtime code.",
+        "submitted_at": "2025-03-19T19:12:00+00:00"
+      },
+      {
+        "user": "exceptionfactory",
+        "comment": "Thanks for the updates @dariuszseweryn, I raised one more key question regarding the `CountDownLatch` instance, and some test-related items, but otherwise this looks close to completion.",
+        "submitted_at": "2025-03-25T01:27:53+00:00"
+      },
+      {
+        "user": "exceptionfactory",
+        "comment": "Thanks for working through the feedback @dariuszseweryn, the latest version looks good. +1 merging",
+        "submitted_at": "2025-03-25T15:20:49+00:00"
+      },
+      "The naming convention of `Impl` should be avoided. In general, implementation classes use a prefixed word, such as `Standard` or something more specific.",
+      "Although helpful for information, this places an unintentional dependency on the JetBrains annotation and should be removed.",
+      "I don't think this name is sufficiently clear to communicate the intent of the interface and associated implementations.",
+      "This naming of `consumeHalter` is not very clear, nor does it align with the interface name. It also references the implementation versus the interface, so that should be changed.",
+      "```suggestion\r\n                                     final int numRetries, final DateTimeFormatter dateTimeFormatter, RecordProcessorBlocker recordProcessorBlocker) {\r\n```",
+      "```suggestion\r\n                                        final RecordConverter recordConverter, final RecordProcessorBlocker recordProcessorBlocker) {\r\n```",
+      "It looks like these test methods should be renamed to align with the new method names.",
+      "```suggestion\r\n    private static Runnable createPauseRunnable(final SwitchableRecordProcessorBlocker recordProcessorBlocker) {\r\n        return () -> {\r\n            try {\r\n                recordProcessorBlocker.await();\r\n```",
+      "The general convention is to use `import static` for assert methods.\r\n```suggestion\r\n        assertTrue(thread.isAlive());\r\n```",
+      "Is this interface only necessary for testing? It seems like it could be removed. If not, then also needs some naming attention.",
+      "As this is the regular implementation, recommend using `Standard` for the name:\r\n```suggestion\r\npublic class StandardRecordProcessorBlocker implements RecordProcessorBlocker {\r\n```",
+      "```suggestion\r\n    private CountDownLatch blocker = new CountDownLatch(0);\r\n```",
+      "This appears to be used only in tests. If so, recommend extracting any non-runtime code from this class.",
+      "I would argue that standard does not provide much information on what behavior the class has",
+      "Anyway, changed",
+      "I agree that `Standard` doesn't say anything about what it does, but I think it is sufficient in this case as `Switchable` doesn't make it clear what can be switched. Thanks for making the adjustment.",
+      "Can the `StandardRecordProcessorBlocker` be used here? It seems like the Noop instance is not required for standard behavior in this case.",
+      "```suggestion\r\n        public void awaitStarted() {\r\n```",
+      "It looks like these variables and methods should be updated to reflect the `Blocker` naming.",
+      "What happens if `unblock()` and `block()` get called while the RecordProcessor is waiting on this call, since the `CountDownLatch` instance would be changed in the `block()` method?\r\n\r\nThe `CyclicBarrier` can be reset, but doesn't have all the semantics that seem to be required.",
+      "Indeed, behavior has changed and it is not useful.",
+      "`block()` does not create a new `CountDownLatch` if previous `CountDownLatch#getCount` above 0. Since `block` and `unblock` are synchronized there should not be a case that a RecordProcessor would wait indefinitely",
+      "The `await()` method is not synchronized, so the issue isn't waiting indefinitely, but whether there are any issues with the `CountDownLatch` instance changing.",
+      "I don't think there are any issues with changing `CountDownLatch` as we can have two outputs:\r\n1. waiting indefinitely, which is not the case\r\n2. not waiting when we should\r\n\r\nMy understanding is that by `await()` not being synchronized we gain no/little contention on the happy-path the at the expense of RecordProcessor awaiting eventually",
+      "Thanks for replies @dariuszseweryn, the current approach sounds good under the circumstances."
+    ],
+    "merged_at": "2025-03-25T15:21:39+00:00",
+    "num_comments": 29,
+    "num_files": 10
+  },
+  {
+    "number": 9807,
+    "diff_url": "https://github.com/apache/nifi/pull/9807.diff",
+    "reviews": [
+      {
+        "user": "exceptionfactory",
+        "comment": "Thanks for these functional and structural improvements @pvillard31, the changes look good overall. Just one minor note to remove unnecessary declaration of the JUnit and Mockito test dependencies, then this should be ready to go.\r\n\r\nThanks for the review @dan-s1!",
+        "submitted_at": "2025-04-08T18:38:25+00:00"
+      },
+      {
+        "user": "exceptionfactory",
+        "comment": "Thanks again @pvillard31! +1 merging",
+        "submitted_at": "2025-04-08T20:43:32+00:00"
+      },
+      "You can use try with resources to close `consumerService` although you will end up with an empty `try` block.  Ditto for lines 406-410\r\n```suggestion\r\n                           try (consumerService){\r\n            } catch (IOException ex) {\r\n                getLogger().warn(\"Failed to close Kafka Consumer Service\", ex);\r\n            }\r\n```",
+      "Couldn't all this (including lines 137-138) be placed in a try with resources\r\n```suggestion\r\n                       try (OutputStream out = session.write(flowFile);\r\n                                 RecordSetWriter writer = writerFactory.createWriter(logger, writeSchema, out, attributes)) {\r\n                                writer.beginRecordSet();\r\n                                recordGroup = new RecordGroup(flowFile, writer, topic, partition);\r\n                                recordGroups.put(groupCriteria, recordGroup);\r\n                            }\r\n```",
+      "Instead of adding three individual tests create one JUnit5 `ParamaterizedTest` and name the tests with your method source argument using `Arguments.argumentSet`. You can then just have the contents of `testSingleInvalidRecord` in that test.",
+      "No need for `Collections.singletonList` as there is `List.of`\r\n```suggestion\r\n            consumer.subscribe(List.of(getClass().getName()));\r\n```",
+      "Couldn't `Set.of` be sufficient?\r\n```suggestion\r\n        rollback(Set.of(partitions));\r\n```",
+      "Ditto for lin 333\r\n```suggestion\r\n        final PollingContext pollingContext = new PollingContext(GROUP_ID, Set.of(TOPIC), AutoOffsetReset.EARLIEST);\r\n```",
+      "This method and the following 4 tests should all be part of a `ParamaterizedTest`",
+      "I could use `Set.copyOf()` but not sure to see the benefit",
+      "I feel like explicitly calling the `close()` here is making things easier to read compared to an empty try block. I can definitely make the change if there is a consensus that the empty block is better.",
+      "These three JUnit and Mockito dependencies can be removed since they are included in the default set of dependencies in the root Maven Configuration",
+      "Done, thanks @exceptionfactory "
+    ],
+    "merged_at": "2025-04-08T20:44:51+00:00",
+    "num_comments": 13,
+    "num_files": 40
+  },
+  {
+    "number": 9799,
+    "diff_url": "https://github.com/apache/nifi/pull/9799.diff",
+    "reviews": [
+      {
+        "user": "exceptionfactory",
+        "comment": "Thanks for proposing this new function @pvillard31. The basic concept makes sense, but I think a different name would be more intuitive.\r\n\r\nThe `mapTo` name seems to imply the argument contains the destination, reminding me of the Kotlin [mapTo](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/map-to.html) functions. Just using `map` seems too generic, but something that incorporates that word is a good starting point.\r\n\r\nOptions such as `mapKeyValue` or `mapKeyPatternValue` come to mind, although the latter is more verbose. Even `mapKeyValue` isn't the most clear.\r\n\r\nOne other concern is the `,` separator, which could be problematic for matching `,` characters in the expression itself.\r\n\r\nOne that comes to mind is altering the approach to take only one pattern and one value at a time. This would require multiple function calls, but could be cleaner. Could the desired behavior accomplished using multiple `replace` or `replaceFirst` calls? Perhaps building on the `replace` naming would be a better way to go.\r\n\r\nThose are some initial thoughts, glad to discuss this further to consider the best solution.",
+        "submitted_at": "2025-03-13T14:00:29+00:00"
+      },
+      {
+        "user": "exceptionfactory",
+        "comment": "Thanks for making the adjustments @pvillard31. I think `replaceByPattern` is a good fit for the functionality, and I agree the `,` separator is somewhat of an edge case that could be addressed in the future with an additional optional argument providing an alternative delimiter if needed.\r\n\r\nI plan to merge pending successful builds.",
+        "submitted_at": "2025-03-13T15:44:08+00:00"
+      },
+      "This maybe a little late but I do not think you need `Collections.emptyMap() ` for this, couldn't you just use `Map.of()` ?\r\n```suggestion\r\n            this.compiledPatterns = compilePatterns(search.evaluate(new StandardEvaluationContext(Map.of())).getValue());\r\n```",
+      "Thanks @dan-s1, they are functionally equivalent, but I agree `Map.of()` is preferred. I just merged the PR, but good to keep in mind for the future."
+    ],
+    "merged_at": "2025-03-13T16:44:19+00:00",
+    "num_comments": 4,
+    "num_files": 6
+  },
+  {
+    "number": 9748,
+    "diff_url": "https://github.com/apache/nifi/pull/9748.diff",
+    "reviews": [
+      {
+        "user": "exceptionfactory",
+        "comment": "Thanks for picking up these changes @sfc-gh-mgemra, this looks good except for one remaining detail regarding the value and displayName for the enum.",
+        "submitted_at": "2025-02-25T20:01:56+00:00"
+      },
+      {
+        "user": "exceptionfactory",
+        "comment": "Thanks for making the adjustments @sfc-gh-mgemra. On final review, I noticed the property value comparison could be simplified, and I also adjusted the described value display names to `Empty` and `Original` in order to align more closely with the actual behavior.\r\n\r\nPlanning to merge pending successful automated builds.",
+        "submitted_at": "2025-02-26T05:06:36+00:00"
+      },
+      {
+        "user": "exceptionfactory",
+        "comment": "Thanks again for the work on this @pvillard31 and @sfc-gh-mgemra! +1 merging",
+        "submitted_at": "2025-02-26T15:37:34+00:00"
+      },
+      "\"Title Case\" should be used for these property values.\r\n```suggestion\r\n            \"Overwrite Content\",\r\n```",
+      "```suggestion\r\n            \"Ignore Results\",\r\n```",
+      "There is one Checkstyle violation for this line:\r\n\r\n```\r\nsrc/main/java/org/apache/nifi/processors/standard/AbstractExecuteSQL.java:[477,128] (whitespace) OperatorWrap: '||' should be on a new line.\r\n```",
+      "This should use the `name()` method to align with the enum.\r\n```suggestion\r\n            return name();\r\n```",
+      "```suggestion\r\n        private final String displayName;\r\n        private final String description;\r\n\r\n        ContentOutputStrategy(final String displayName, final String description) {\r\n            this.displayName = displayName;\r\n```"
+    ],
+    "merged_at": "2025-02-26T15:39:09+00:00",
+    "num_comments": 8,
+    "num_files": 5
+  },
+  {
+    "number": 9740,
+    "diff_url": "https://github.com/apache/nifi/pull/9740.diff",
+    "reviews": [
+      {
+        "user": "exceptionfactory",
+        "comment": "Thanks for introducing this new Processor @ChrisSamo632. The general approach looks good. Although I understand it is based on `GetS3ObjectMetadata`, I noted one suggestion about enumerated values for the Tags Target property. Otherwise this looks straightforward.",
+        "submitted_at": "2025-02-24T15:08:03+00:00"
+      },
+      {
+        "user": "exceptionfactory",
+        "comment": "Thanks for making the adjustments @ChrisSamo632, the latest version looks good!",
+        "submitted_at": "2025-02-26T17:21:43+00:00"
+      },
+      "Instead of using the `AllowableValue` instance, I recommend creating an `enum` that implements `DescribedValue`.",
+      "Agreed - I'd taken to quick \"copy & paste\" route, and forgot to look into that at the same time\r\n\r\nI've updated by `GetS3ObjectTags` and `GetS3ObjectMetadata` to use `DescribeValue` enums rather than `AllowedValue`s\r\n\r\nI've stopped short of refactoring the two processors to use a new abstract class for shared code (they're pretty similar), thinking that any such move would be best suited to when all S3 processors are migrated to use AWS SDK v2, which might identify other such refactoring opporunities along the way",
+      "Thanks @ChrisSamo632! I agree, more substantive refactoring probably makes sense as part of the work required for moving these Processors to AWS SDK 2."
+    ],
+    "merged_at": "2025-02-26T17:22:18+00:00",
+    "num_comments": 5,
+    "num_files": 14
+  },
+  {
+    "number": 9738,
+    "diff_url": "https://github.com/apache/nifi/pull/9738.diff",
+    "reviews": [
+      {
+        "user": "exceptionfactory",
+        "comment": "Thanks for introducing this new property support @dariuszseweryn. The general approach looks good. I noted a few implementation detail recommendations.",
+        "submitted_at": "2025-02-26T17:40:38+00:00"
+      },
+      {
+        "user": "exceptionfactory",
+        "comment": "Thanks for making the updates @dariuszseweryn, this looks close to completion, just noted two more items to address.",
+        "submitted_at": "2025-03-01T17:35:34+00:00"
+      },
+      {
+        "user": "exceptionfactory",
+        "comment": "Thanks for the updates @dariuszseweryn, one more recommendation related to property ordering, and then this looks ready to go.",
+        "submitted_at": "2025-03-04T15:16:19+00:00"
+      },
+      {
+        "user": "exceptionfactory",
+        "comment": "Thanks again for implementing the new feature for Kinesis Streaming @dariuszseweryn, looks good! +1 merging",
+        "submitted_at": "2025-03-04T21:10:29+00:00"
+      },
+      "Repeating string value is not necessary:\r\n```suggestion\r\n    USE_VALUE(\"Use Content as Value\", \"Write only the Kinesis Record value to the FlowFile record.\"),\r\n    USE_WRAPPER(\"Use Wrapper\", \"Write the Kinesis Record value and metadata into the FlowFile record.\");\r\n```",
+      "After removing the `value` property, this can be changed to `name()`:\r\n```suggestion\r\n        return name();\r\n```",
+      "This should be changed to use `asAllowableValue(OutputStrategy.class)` so that the comparison against the `enum` can be used.",
+      "It looks like the fully-qualified class can be replaced with a standard import, will that work?",
+      "See note on the interface about the qualified class versus importing.",
+      "I recommend removing this test case since evaluating error messages is generally not useful.",
+      "Is there a reason this property name is not prefixed with `aws` like the others?",
+      "Recommend using `LinkedHashMap` in this case to ensure consistent ordering.",
+      "Recommend reversing the ternary conditional as follows:\r\n```suggestion\r\n        metadata.put(APPROX_ARRIVAL_TIMESTAMP, approxArrivalTimestamp == null ? null : approxArrivalTimestamp.toEpochMilli());\r\n```",
+      "`List.of()` can be used here.",
+      "NP, is there such convention explained? Always thought that the null case is less interesting and therefore it can come last",
+      "Actually \u2014 I don't think so. Adding",
+      "I don't think it is written anywhere in particular, but the general approach is to evaluate the statement \"positively\" (if A equals B) instead of \"negatively\" (if A does not equal B) to make it a bit easier to follow. It isn't a strict rule, but a useful convention in some conditionals and ternaries.",
+      "I recommend refactoring this method to combine it with `toWrapperRecordMetadata` so that the creation of the `Tuple` object can be avoided. For a simple conversion method, which will be executed thousands of times, there is some value in minimizing unnecessary object creation where possible.",
+      "Wildcard imports should be avoided. It can happen automatically in some cases with IntelliJ default formatting, so that may be something to check.",
+      "On further consideration and comparison to the Kafka metadata wrapper, recommend simplifying these property names and removing the use of the `.` separator. The record is already implied to be from Kinesis, so the `aws.kinesis` prefix is not needed, and avoiding the use of the `.` separator should avoid some potential issues with downstream components parsing JSON.\r\n```suggestion\r\n    private static final String STREAM = \"stream\";\r\n    private static final String SHARD_ID = \"sharedId\";\r\n    private static final String SEQUENCE_NUMBER = \"sequenceNumber\";\r\n    private static final String PARTITION_KEY = \"partitionKey\";\r\n    private static final String APPROX_ARRIVAL = approximateArrival\";\r\n```",
+      "There's a typo in SHARD_ID. Anyways, fixed",
+      "For organizational purposes, it would be better to move `Output Strategy` immediately after the Record Reader and Record Writer properties."
+    ],
+    "merged_at": "2025-03-04T21:11:19+00:00",
+    "num_comments": 22,
+    "num_files": 9
+  }
+]

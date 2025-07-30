@@ -1,0 +1,96 @@
+[
+  {
+    "number": 131945,
+    "diff_url": "https://github.com/elastic/elasticsearch/pull/131945.diff",
+    "reviews": [
+      "Hmm, pipeline breakers are also being used in node-/cluster-level reduction [here](https://github.com/elastic/elasticsearch/blob/c0facac75c99cb36793372ad3601c06d13961a3d/x-pack/plugin/esql/src/main/java/org/elasticsearch/xpack/esql/planner/PlannerUtils.java#L123); I don't think this applies to FORK, as FORK cannot be applied in multiple steps (yet?); each FORK branch seems to be hooked up to the same exchange sink on the coordinator. @ioanatia , please correct me if I'm wrong.\r\n\r\nWe may be introducing a subtle bug here, or maybe not; in any case, it indicates that the `PipelineBreaker` interface needs further refinement, because for validation purposes `FORK` definitely is a pipeline breaker, even if it can't be used for node-/cluster-level reduction.\r\n\r\nMaybe we should just add a method `PipelineBreaker#isReducer` or similar? It could default to `true` and return `false` for `Fork`.",
+      "I am not sure adding `PipelineBreaker` has any effect at all.\r\n\r\n`PipelineBreaker` is indeed used [here](https://github.com/elastic/elasticsearch/blob/c0facac75c99cb36793372ad3601c06d13961a3d/x-pack/plugin/esql/src/main/java/org/elasticsearch/xpack/esql/planner/PlannerUtils.java#L123) - but I don't see in which case we would ever get to a point where a `FragmentExec` contains a logical plan that contains a `Fork` plan. Let me know if that's not the case.\r\n\r\n",
+      "Thanks for confirming @ioanatia, that makes sense ! If we're never pulling FORKS out of fragments, then this change should be safe. \r\n\r\nIf we're marking `Fork` as `PipelineBreaker`, maybe we could at least add a comment [here](https://github.com/elastic/elasticsearch/blob/c0facac75c99cb36793372ad3601c06d13961a3d/x-pack/plugin/esql/src/main/java/org/elasticsearch/xpack/esql/planner/PlannerUtils.java#L123) to remind future us that `Fork`'s never going to show up here."
+    ],
+    "merged_at": "2025-07-28T18:03:53+00:00",
+    "num_comments": 3,
+    "num_files": 5
+  },
+  {
+    "number": 131908,
+    "diff_url": "https://github.com/elastic/elasticsearch/pull/131908.diff",
+    "reviews": [
+      {
+        "user": "ywangd",
+        "comment": "LGTM",
+        "submitted_at": "2025-07-28T01:12:22+00:00"
+      },
+      "This class doesn't do a lot, but it makes the code that uses it a lot clearer.\r\nThe 1 line in `CompositeRolesStore` becomes really obvious:\r\n```\r\n  new ProjectDeletedListener(this::removeProject).attach(clusterService);\r\n```\r\n",
+      "There is a fix annotation for this field on line 116 which can now be removed.",
+      "Instead of mocking, we could create an actual cluster service with something like `ClusterServiceUtils.createClusterService(new DeterministicTaskQueue().getThreadPool())` and `ClusterServiceUtils.setState` to apply new states. This is often preferrable to excercise the entire event loop for the listener.",
+      "It's useful if the class does not already listen for cluster state changes. I guess there are probably a number of such classes.",
+      "Same here."
+    ],
+    "merged_at": "2025-07-30T06:32:12+00:00",
+    "num_comments": 6,
+    "num_files": 7
+  },
+  {
+    "number": 131805,
+    "diff_url": "https://github.com/elastic/elasticsearch/pull/131805.diff",
+    "reviews": [
+      "@jan-elastic rerunning tests to generate the docs updated some param types, lemme know if this is expected",
+      "yes, that looks good. Guess I forget to regen the docs after the final update",
+      "@leemthompo One more thing: this options field is only available from 9.2.0 onwards. I don't think that's reflected in the docs right now.",
+      "https://github.com/elastic/elasticsearch/pull/131805/commits/310bf8697ec18f9d832e716b42185532b378f7ae",
+      "It's not just about the `output_format` field, but about the complete `options` map (in code: `@MapParam(name = \"options\", ...)`)",
+      "ah ok gotcha ",
+      "https://github.com/elastic/elasticsearch/pull/131805/commits/a36cd8fc73da6c4681a25486dc8d3e841d6afac7"
+    ],
+    "merged_at": "2025-07-28T07:31:55+00:00",
+    "num_comments": 7,
+    "num_files": 7
+  },
+  {
+    "number": 131775,
+    "diff_url": "https://github.com/elastic/elasticsearch/pull/131775.diff",
+    "reviews": [
+      {
+        "user": "jan-elastic",
+        "comment": "LGTM on the changes to SAMPLE\r\n\r\nI'll leave reviewing the remainder to someone more knowledgeable about the internal data types.",
+        "submitted_at": "2025-07-24T06:54:40+00:00"
+      },
+      {
+        "user": "astefan",
+        "comment": "LGTM",
+        "submitted_at": "2025-07-24T13:30:17+00:00"
+      },
+      "Added some helpers to centralize the logic and messages here",
+      "Missing types for the docs",
+      "This trivially allowed unsigned longs, so just allowed it",
+      "This trivially allowed unsigned longs, so just allowed it",
+      "This was technically allowing counters before, but I'm not sure we actually wanted it (?)\r\n\r\nAlso, it allowed things like date period, which led to `illegal data type [date_period]` 500 errors",
+      "I'm changing this list of most types to \"any but counters and spatial\", which should be enough here",
+      "Pretty weird, but I needed it to make type tests work for Count",
+      "I mostly copied this from `Values`, assuming that was correct",
+      "same here",
+      "Huh. I thought the tests would catch that.",
+      "Mostly. We check that every type in tests appears there, but if it isn't tested, we do nothing. And Count didn't have \"error types\" tests to check that we tested all the types"
+    ],
+    "merged_at": "2025-07-28T13:01:26+00:00",
+    "num_comments": 13,
+    "num_files": 35
+  },
+  {
+    "number": 131766,
+    "diff_url": "https://github.com/elastic/elasticsearch/pull/131766.diff",
+    "reviews": [
+      {
+        "user": "Mikep86",
+        "comment": "LGTM!",
+        "submitted_at": "2025-07-23T16:28:23+00:00"
+      },
+      "For my learning: Why does this link use the `retrievers//` prefix, while others use `retrievers/`?",
+      "ha that's a typo, but it seems like CI is lenient on this? TIL. \r\n\r\nI'll fix it anyway to avoid confusing people :)",
+      "```suggestion\r\nA more specific example of highlighting in RRF can also be found in the [retrievers examples](retrievers/retrievers-examples.md#retrievers-examples-highlighting-retriever-results) page.\r\n```"
+    ],
+    "merged_at": "2025-07-24T06:59:53+00:00",
+    "num_comments": 4,
+    "num_files": 5
+  }
+]

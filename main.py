@@ -71,9 +71,12 @@ def fetch_prs(repo, merged_since, limit=50):
     pr_numbers = fetch_pr_numbers(repo, merged_since, limit)
     pr_data = []
     for pr_num in pr_numbers:
-        pr_info = fetch_pr_reviews(repo, pr_num)
-        if pr_info['reviews'] and pr_info['num_comments'] >= 3 and pr_info['num_files'] >= 5:
-            pr_data.append(pr_info)
+        try:
+            pr_info = fetch_pr_reviews(repo, pr_num)
+            if pr_info['reviews'] and pr_info['num_comments'] >= 3 and pr_info['num_files'] >= 5:
+                pr_data.append(pr_info)
+        except Exception as e:
+            print(f"Failed to fetch PR #{pr_num}: {e}")
     return pr_data
 
     
@@ -82,5 +85,10 @@ if __name__ == "__main__":
     es_data = fetch_prs("elastic/elasticsearch", "2024-07-30", limit=200)
     nifi_data = fetch_prs("apache/nifi", "2024-07-30", limit=200)
 
-    print("Elasticsearch PRs:", es_data)
-    print("Apache NiFi PRs:", nifi_data)
+    with open("es_data.json", "w") as f:
+        json.dump(es_data, f, indent=2)
+
+    with open("nifi_data.json", "w") as f:
+        json.dump(nifi_data, f, indent=2)
+
+    print(f"Fetched {len(es_data)} PRs from elasticsearch and {len(nifi_data)} PRs from nifi.")
