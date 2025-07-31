@@ -74,6 +74,34 @@ GARA/
 
 ---
 
+## 🤝 Contributing
+
+### Ways to Contribute
+
+- **🐛 Bug Reports:** Found an issue? Open a GitHub issue with detailed steps to reproduce
+- **💡 Feature Requests:** Have an idea for improvement? We'd love to hear it!
+- **📝 Documentation:** Help improve our README, add code comments, or create tutorials
+- **🔧 Code Contributions:** Submit pull requests for bug fixes or new features
+- **🧪 Testing:** Help test new features and report feedback
+
+### Getting Started
+
+1. **Fork the Repository:** Click the "Fork" button on the GitHub page
+2. **Create a Branch:** `git checkout -b feature/your-feature-name`
+3. **Make Changes:** Implement your improvements with clear, commented code
+4. **Test Thoroughly:** Ensure your changes work as expected
+5. **Submit a PR:** Open a pull request with a clear description of your changes
+
+### Development Guidelines
+
+- Follow existing code style and conventions
+- Add comments for complex logic
+- Update documentation if you're changing functionality
+- Test your changes before submitting
+
+---
+
+
 ## 📄 License & Credits
 
 This project is licensed under the MIT License.
