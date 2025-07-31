@@ -1,3 +1,11 @@
+"""
+main.py
+
+This script automates the retrieval and filtering of merged pull request (PR) data from GitHub repositories
+using the GitHub API and GitHub CLI (`gh`). It is used in the GARA (GitHub Automated Review Assistant) pipeline
+to generate structured training data from real PR review activity.
+"""
+
 import subprocess
 import json
 import os
@@ -5,19 +13,18 @@ import time
 from github import Github
 from github.GithubException import RateLimitExceededException
 
+# Load GitHub token from environment variable
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
 if not GITHUB_TOKEN:
     raise ValueError("GITHUB_TOKEN environment variable not set. Please set it.")
 
 g = Github(GITHUB_TOKEN)
 
-# Old
-# Fetch PRs from two popular repositories
-
-# New
-# Fetch pull request data from Elasticsearch and Apache NiFi
-
 def fetch_pr_numbers(repo, merged_since, limit=50):
+    """
+    Uses GitHub CLI to fetch a list of merged PR numbers for a given repository
+    that were merged after a specified date.
+    """
     cmd = [
         'gh', 'pr', 'list',
         '--repo', repo,
@@ -34,6 +41,10 @@ def fetch_pr_numbers(repo, merged_since, limit=50):
     return [pr["number"] for pr in prs]
 
 def fetch_pr_reviews(repo_name, pr_number):
+    """
+    Uses the GitHub API to retrieve detailed review and comment data for a single pull request.
+    Returns structured information for analysis or fine-tuning.
+    """
     repo = g.get_repo(repo_name)
     
     try: 
@@ -74,6 +85,10 @@ def fetch_pr_reviews(repo_name, pr_number):
         return fetch_pr_reviews(repo_name, pr_number)
 
 def fetch_prs(repo, merged_since, limit=50):
+    """
+    Fetches and filters merged PRs for a given repo. 
+    Returns PRs with at least 3 comments and 5 changed files.
+    """
     pr_numbers = fetch_pr_numbers(repo, merged_since, limit)
     pr_data = []
     for pr_num in pr_numbers:
@@ -85,9 +100,8 @@ def fetch_prs(repo, merged_since, limit=50):
             print(f"Failed to fetch PR #{pr_num}: {e}")
     return pr_data
 
-    
-
 if __name__ == "__main__":
+    # Fetch and save PR data from two major OSS repositories
     es_data = fetch_prs("elastic/elasticsearch", "2024-07-30", limit=200)
     nifi_data = fetch_prs("apache/nifi", "2024-07-30", limit=200)
 
