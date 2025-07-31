@@ -1,0 +1,23 @@
+name: GARA PR Review
+
+on:
+  pull_request:
+    types: [opened, reopened, edited, synchronize]
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Get PR diff
+        run: |
+          curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+          "${{ github.event.pull_request.diff_url }}" -o pr.diff
+
+      - name: Send to GARA
+        run: |
+          curl -X POST ${{ secrets.GARA_SERVER_URL }}/review \
+          -H "Content-Type: application/json" \
+          -d @<(echo "{\"diff\": \"$(sed ':a;N;$!ba;s/\n/\\n/g' pr.diff | sed 's/"/\\"/g')\"}")
