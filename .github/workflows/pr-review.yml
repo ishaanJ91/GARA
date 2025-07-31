@@ -33,6 +33,9 @@ jobs:
       - name: Extract PR number
         run: echo "PR_NUMBER=${{ github.event.pull_request.number }}" >> $GITHUB_ENV
 
+      - name: Print review comment
+        run: echo "$REVIEW_COMMENT"
+
       - name: Post review comment to PR
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
