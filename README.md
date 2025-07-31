@@ -1,81 +1,5 @@
 # GARA – GitHub Automated Review Assistant
 
-GARA is a production-ready AI-powered code review assistant that integrates directly into GitHub pull requests. It leverages a fine-tuned version of `Mistral-7B-Instruct-v0.2` with LoRA (Parameter-Efficient Fine-Tuning) to provide contextual and constructive code reviews in real-time.
-
----
-
-## 🔧 Features
-
-- 🔍 **Automated code review** on every GitHub PR
-- 🤖 Fine-tuned LLM (Mistral-7B + LoRA) for review generation
-- 📤 Pushes review comments directly to GitHub via Actions
-- 🌐 FastAPI + ngrok backend for public inference endpoint
-- 🧠 Custom prompt engineering for structured feedback
-
----
-
-## 🧪 How It Works
-
-1. A new pull request triggers a GitHub Action.
-2. The diff is extracted and sent to a FastAPI server running the fine-tuned LLM.
-3. The model generates a review and posts it as a comment on the PR.
-
----
-
-## 🚀 Setup Instructions
-
-### 1. Clone the repo
-
-```bash
-git clone https://github.com/ishaanJ91/GARA.git
-cd GARA
-```
-
-### 2. Launch the model API (via Colab or local)
-
-- Run `app.py` or use `lore_finetune.ipynb` to serve the FastAPI endpoint
-- Start ngrok tunnel: `ngrok http 7860`
-
-### 3. Update GitHub secret
-
-Use `push_ngrok.py` to set the `GARA_SERVER_URL` secret dynamically.
-
-### 4. Test it!
-
-Create a new pull request in this repo and watch the model comment live.
-
----
-
-## 🧠 Model Details
-
-- Base: `mistralai/Mistral-7B-Instruct-v0.2`
-- Fine-tuned using LoRA adapters via Hugging Face PEFT
-- Trained on PR diffs + reviewer comment pairs from Java repos
-
----
-
-## 📦 Directory Structure
-
-- `app.py` – FastAPI server for inference
-- `main.py` – PR scraper and data collector
-- `lore_finetune.ipynb` – Notebook for LoRA training
-- `push_ngrok.py` – Utility to sync ngrok URL to GitHub secret
-- `.github/workflows/pr-review.yml` – GitHub Actions workflow
-
----
-
-## 📄 License
-
-MIT License
-
----
-
-## 🙌 Credits
-
-Built by @ishaanJ91 with support from Open Source AI tools and GitHub Actions ❤️
-
-# GARA – GitHub Automated Review Assistant
-
 GARA is an open-source project designed to automate the process of code review on GitHub using a fine-tuned Large Language Model (LLM). By integrating with GitHub Actions, GARA automatically analyzes pull request diffs and posts a detailed, constructive review directly to the PR thread, providing a powerful assistant for developers.
 
 The project is built on the Mistral-7B model, fine-tuned with the LoRA technique, to generate high-quality, relevant, and actionable code review comments.
@@ -150,17 +74,7 @@ GARA/
 
 ---
 
-## 🚧 Future Work
-
-- Implement a caching layer for the review API to avoid re-processing identical diffs.
-- Explore more advanced fine-tuning techniques or alternative models.
-- Develop a more sophisticated evaluation framework to track model performance over time.
-- Add support for other version control systems like GitLab.
-
----
-
 ## 📄 License & Credits
 
 This project is licensed under the MIT License.
-
-This project was built with the help of the amazing open-source libraries from the Hugging Face ecosystem.
+This project was built with the help of the open-source libraries from the Hugging Face ecosystem.
