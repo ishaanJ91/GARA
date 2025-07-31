@@ -4,7 +4,7 @@ GARA is an open-source project designed to automate the process of code review o
 
 The project is built on the Mistral-7B model, fine-tuned with the LoRA technique, to generate high-quality, relevant, and actionable code review comments.
 
-### 🔗 [View the Project on GitHub](https://github.com/ishaanJ91/GARA)
+![Project Demo](demo.gif)
 
 ---
 
@@ -100,7 +100,6 @@ GARA/
 - Test your changes before submitting
 
 ---
-
 
 ## 📄 License & Credits
 
