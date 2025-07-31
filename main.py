@@ -11,6 +11,12 @@ if not GITHUB_TOKEN:
 
 g = Github(GITHUB_TOKEN)
 
+# Old
+# Fetch PRs from two popular repositories
+
+# New
+# Fetch pull request data from Elasticsearch and Apache NiFi
+
 def fetch_pr_numbers(repo, merged_since, limit=50):
     cmd = [
         'gh', 'pr', 'list',
