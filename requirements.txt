@@ -1,7 +1,0 @@
-fastapi
-uvicorn
-peft
-transformers
-bitsandbytes
-torch
-PyGithub
