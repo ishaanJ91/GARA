@@ -16,8 +16,21 @@ jobs:
           curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
           "${{ github.event.pull_request.diff_url }}" -o pr.diff
 
-      - name: Send to GARA
+      - name: Send diff to GARA API
+        id: review
         run: |
-          curl -X POST ${{ secrets.GARA_SERVER_URL }}/review \
-          -H "Content-Type: application/json" \
-          -d @<(echo "{\"diff\": \"$(sed ':a;N;$!ba;s/\n/\\n/g' pr.diff | sed 's/"/\\"/g')\"}")
+          RESPONSE=$(curl -s -X POST "${{ secrets.GARA_SERVER_URL }}/review" \
+            -H "Content-Type: application/json" \
+            -d @<(echo "{\"diff\": \"$(sed ':a;N;$!ba;s/\n/\\n/g' pr.diff | sed 's/"/\\"/g')\"}"))
+          echo "REVIEW_COMMENT<<EOF" >> $GITHUB_ENV
+          echo "$RESPONSE" | jq -r '.review' >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      - name: Extract PR number
+        run: echo "PR_NUMBER=${{ github.event.pull_request.number }}" >> $GITHUB_ENV
+
+      - name: Post review comment to PR
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "$REVIEW_COMMENT" | gh pr comment $PR_NUMBER --body -
