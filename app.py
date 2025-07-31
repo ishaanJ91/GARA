@@ -1,27 +1,32 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 from pydantic import BaseModel
 from transformers import AutoTokenizer, AutoModelForCausalLM
 from peft import PeftModel
-import torch, os
-from huggingface_hub import login
-
-login(token=os.environ.get("HF_TOKEN"))
+import torch
 
 app = FastAPI()
 
+# Load base model and LoRA adapter
 base = AutoModelForCausalLM.from_pretrained(
-    "mistralai/Mistral-7B-Instruct-v0.2", device_map="auto", load_in_4bit=True
+    "mistralai/Mistral-7B-Instruct-v0.2",
+    device_map="auto",
+    load_in_4bit=True
 )
 model = PeftModel.from_pretrained(base, "ishaanj91/mistral-code-review-lora")
 tokenizer = AutoTokenizer.from_pretrained("ishaanj91/mistral-code-review-lora")
 
+# Define request schema
 class ReviewRequest(BaseModel):
     diff: str
 
 @app.post("/review")
-def review_code(req: ReviewRequest):
-    prompt = f"Review this code diff:\n\n{req.diff}"
+def review_code(request: ReviewRequest):
+    prompt = f"""Review this code diff:\n\n{request.diff}\n\n---\nGive constructive suggestions and describe what the code change does."""
+    print("Prompt used for review:", prompt)
+
     inputs = tokenizer(prompt, return_tensors="pt").to("cuda")
     output = model.generate(**inputs, max_new_tokens=300)
     review = tokenizer.decode(output[0], skip_special_tokens=True)
-    return {"review": review}# test trigger
+
+    print("Decoded review:", review)
+    return {"review": review}
