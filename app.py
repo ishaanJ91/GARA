@@ -3,6 +3,9 @@ from pydantic import BaseModel
 from transformers import AutoTokenizer, AutoModelForCausalLM
 from peft import PeftModel
 import torch, os
+from huggingface_hub import login
+
+login(token=os.environ.get("HF_TOKEN"))
 
 app = FastAPI()
 
@@ -21,4 +24,4 @@ def review_code(req: ReviewRequest):
     inputs = tokenizer(prompt, return_tensors="pt").to("cuda")
     output = model.generate(**inputs, max_new_tokens=300)
     review = tokenizer.decode(output[0], skip_special_tokens=True)
-    return {"review": review}
+    return {"review": review}# test trigger
