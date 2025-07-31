@@ -23,11 +23,15 @@ jobs:
       - name: Send diff to GARA API
         id: review
         run: |
+          DIFF=$(sed ':a;N;$!ba;s/\n/\\n/g' pr.diff | sed 's/"/\\"/g')
           RESPONSE=$(curl -s -X POST "${{ secrets.GARA_SERVER_URL }}/review" \
             -H "Content-Type: application/json" \
-            -d @<(echo "{\"diff\": \"$(sed ':a;N;$!ba;s/\n/\\n/g' pr.diff | sed 's/"/\\"/g')\"}"))
+            -d "{\"diff\": \"$DIFF\"}")
+
+          REVIEW=$(echo "$RESPONSE" | jq -r '.review')
+
           echo "REVIEW_COMMENT<<EOF" >> $GITHUB_ENV
-          echo "$RESPONSE" | jq -r '.review' >> $GITHUB_ENV
+          echo "$REVIEW" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
 
       - name: Extract PR number
