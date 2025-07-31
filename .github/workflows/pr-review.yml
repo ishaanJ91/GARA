@@ -16,39 +16,58 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Get PR diff
+        id: get_diff
         run: |
+          # Fetch the raw diff from the pull request and save it to a file
           curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
           "${{ github.event.pull_request.diff_url }}" -o pr.diff
 
-      - name: Send diff to GARA API
-        id: review
+          # Check if the diff file is empty
+          if [ ! -s "pr.diff" ]; then
+            echo "::warning::PR diff file is empty. Skipping review."
+            exit 0
+          fi
+
+      - name: Send diff to GARA API and get review
+        id: get_review
         run: |
-          DIFF=$(sed ':a;N;$!ba;s/\n/\\n/g' pr.diff | sed 's/"/\\"/g')
-          RESPONSE=$(curl -s -X POST "${{ secrets.GARA_SERVER_URL }}/review" \
+          # Use a temporary file to store the escaped diff.
+          # We use `jq` to create a valid JSON string from the diff file content.
+          # This is more robust than a chain of `sed` commands.
+          DIFF_JSON=$(jq -Rs '.' pr.diff)
+
+          # Send the JSON payload to your GARA API
+          # The response is piped directly to `jq` to extract the review text
+          # The review text, which can be multi-line, is saved to a file.
+          curl -s -X POST "${{ secrets.GARA_SERVER_URL }}/review" \
             -H "Content-Type: application/json" \
-            -d "{\"diff\": \"$DIFF\"}")
+            -d "{\"diff\": $DIFF_JSON}" | jq -r '.review' > review_comment.txt
 
-          REVIEW=$(echo "$RESPONSE" | jq -r '.review')
-
-          echo "REVIEW_COMMENT<<EOF" >> $GITHUB_ENV
-          echo "$REVIEW" >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
-
-      - name: Extract PR number
-        run: echo "PR_NUMBER=${{ github.event.pull_request.number }}" >> $GITHUB_ENV
-
-      - name: Print review comment
-        run: echo "$REVIEW_COMMENT"
-
-      - name: Fail if review is empty
+      - name: Check for empty review and set output
+        id: check_review
         run: |
-          if [ -z "$REVIEW_COMMENT" ] || [ "$REVIEW_COMMENT" = "." ]; then
-            echo "Empty or invalid review comment. Failing workflow."
-            exit 1
+          # Read the content of the generated review file
+          REVIEW_CONTENT=$(cat review_comment.txt)
+
+          # Check if the review file is empty or just a dot
+          if [ -z "$REVIEW_CONTENT" ] || [ "$REVIEW_CONTENT" = "." ]; then
+            echo "::error::Received an empty or invalid review. Failing workflow."
+            # Set an output to be used in the next step
+            echo "review_valid=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "::notice::Successfully generated a review."
+            # Set an output to be used in the next step
+            echo "review_valid=true" >> "$GITHUB_OUTPUT"
+            echo "COMMENT_TEXT<<EOF" >> $GITHUB_ENV
+            cat review_comment.txt >> $GITHUB_ENV
+            echo "EOF" >> $GITHUB_ENV
           fi
 
       - name: Post review comment to PR
+        if: steps.check_review.outputs.review_valid == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
-          echo "$REVIEW_COMMENT" | gh pr comment $PR_NUMBER --body -
+          echo "$COMMENT_TEXT" > comment.txt
+          gh pr comment $PR_NUMBER --body-file comment.txt
