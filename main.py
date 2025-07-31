@@ -98,3 +98,6 @@ if __name__ == "__main__":
         json.dump(nifi_data, f, indent=2)
 
     print(f"Fetched {len(es_data)} PRs from elasticsearch and {len(nifi_data)} PRs from nifi.")
+
+    with open("review_comment.txt", "w") as f:
+        f.write("GARA Review Completed: Extracted review data from Elasticsearch and NiFi PRs.")

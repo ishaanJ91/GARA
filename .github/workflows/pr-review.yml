@@ -36,6 +36,13 @@ jobs:
       - name: Print review comment
         run: echo "$REVIEW_COMMENT"
 
+      - name: Fail if review is empty
+        run: |
+          if [ -z "$REVIEW_COMMENT" ] || [ "$REVIEW_COMMENT" = "." ]; then
+            echo "Empty or invalid review comment. Failing workflow."
+            exit 1
+          fi
+
       - name: Post review comment to PR
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
