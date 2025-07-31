@@ -21,11 +21,19 @@ class ReviewRequest(BaseModel):
 
 @app.post("/review")
 def review_code(request: ReviewRequest):
-    prompt = f"""Review this code diff:\n\n{request.diff}\n\n---\nGive constructive suggestions and describe what the code change does."""
+    prompt = f"""You are an expert code reviewer. Here's a code diff from a pull request:
+        {request.diff}
+        Please write a constructive review summarizing:
+        - What the code does
+        - What changed
+        - How it can be improved (if anything)
+        - Whether it follows best practices
+    """
+    
     print("Prompt used for review:", prompt)
 
     inputs = tokenizer(prompt, return_tensors="pt").to("cuda")
-    output = model.generate(**inputs, max_new_tokens=300)
+    output = model.generate(**inputs, max_new_tokens=300, temperature=0.9)
     review = tokenizer.decode(output[0], skip_special_tokens=True)
 
     print("Decoded review:", review)
